@@ -11,6 +11,7 @@ public class CheckpointManager : MonoBehaviour
     List<CheckPoint> checkPoints = new List<CheckPoint>();
 
     int currentCheckpoint;
+    int lastCheckpointNumber;
 
     private void OnEnable()
     {
@@ -26,19 +27,21 @@ public class CheckpointManager : MonoBehaviour
 
     private void Awake()
     {
+        int number = 0; ;
        foreach(var t in GetComponentsInChildren<Transform>())
         {
-            checkPoints.Add(new CheckPoint(t));
+            checkPoints.Add(new CheckPoint(t, number++));
         }
     }
 
     void CheckpointPassed()
     {
-        if (checkPoints[currentCheckpoint + 1].isPassed)
+        if (checkPoints[currentCheckpoint].number == lastCheckpointNumber)
             return;
 
-
-        checkPoints[currentCheckpoint++].isPassed = true;
+        lastCheckpointNumber = checkPoints[currentCheckpoint].number;
+        checkPoints[currentCheckpoint].isPassed = true;
+        currentCheckpoint++;
     }
 
     void FallDown(Transform car)
@@ -48,12 +51,14 @@ public class CheckpointManager : MonoBehaviour
 
     class CheckPoint
     {
-        public bool isPassed;
+       public bool isPassed;
        public Transform transform;
+       public int number;
 
-        public CheckPoint(Transform transform)
+        public CheckPoint(Transform transform, int number)
         {
             this.transform = transform;
+            this.number = number;
         }
 
         
