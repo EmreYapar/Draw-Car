@@ -14,4 +14,20 @@ public class EventManager : MonoBehaviour
         placeWheel(frontPos,backPos,car);
     }
 
+    public delegate void OnCheckpointPassed();
+    public static OnCheckpointPassed checkpointPassed;
+
+    public static void CheckpointPassed()
+    {
+        checkpointPassed();
+    }
+
+    public delegate void OnFallDown(Transform car);
+    public static OnFallDown fallDown;
+
+    public static void FallDown(Transform car)
+    {
+        fallDown(car);
+    }
+
 }

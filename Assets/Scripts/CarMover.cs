@@ -5,21 +5,41 @@ using UnityEngine;
 public class CarMover : MonoBehaviour
 {
 
-    bool shouldMove;
+    bool isLevitating;
+    Rigidbody rb;
+
+    Vector3 localEuler;
+    Vector3 position;
+
+    string str_ground = "Ground";
+
+    bool isGrounded;
+
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(ReduceSpeed());
+        rb = this.GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (!shouldMove)
+        if (isLevitating)
             return;
-        this.GetComponent<Rigidbody>().AddForce(Vector3.right*30);
-        transform.localEulerAngles = new Vector3(0, 0, transform.localEulerAngles.z);
-        transform.position = new Vector3(transform.position.x, transform.position.y, 286);
+
+        if (isGrounded)
+            rb.AddForce(Vector3.right * 30);
+        else
+        {
+            rb.AddForce((Vector3.down + Vector3.left) * 20);
+        }
+            localEuler.z = transform.localEulerAngles.z;
+        transform.localEulerAngles = localEuler;
+
+        position = transform.position;
+        // cube constant z;
+        position.z = 286;
+        transform.position = position;
     }
 
     public void Stop()
@@ -29,7 +49,7 @@ public class CarMover : MonoBehaviour
 
     public void Levitate()
     {
-        shouldMove = false;
+        isLevitating = true;
         Stop();
         this.GetComponent<Rigidbody>().isKinematic = true;
         this.transform.position += Vector3.up*6;
@@ -40,26 +60,34 @@ public class CarMover : MonoBehaviour
         this.GetComponent<Rigidbody>().isKinematic = false;
     }
 
+    
     private void OnCollisionExit(Collision collision)
     {
-        if (!collision.transform.CompareTag("Ground"))
+        if (!collision.transform.CompareTag(str_ground))
             return;
-        
-            shouldMove = false;
-    }
 
-    IEnumerator ReduceSpeed()
-    {
-        while(!shouldMove)
-        {
-          //  this.GetComponent<Rigidbody>().velocity += Vector3.down*2;
-            yield return null;
-        }
+        isGrounded = false;
+
     }
 
     private void OnCollisionStay(Collision collision)
     {
-        if (collision.transform.CompareTag("Ground"))
-            shouldMove = true;
+        if (!collision.transform.CompareTag(str_ground))
+            return;
+            isGrounded = true;
+        isLevitating = false;
+    }
+
+    string tag_checkpoint = "Checkpoint";
+    string tag_death = "Death";
+
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag(tag_death))
+            EventManager.FallDown(this.transform);
+        else if(other.CompareTag(tag_checkpoint))
+            EventManager.CheckpointPassed();
     }
 }

@@ -14,12 +14,14 @@ public class FollowCam : MonoBehaviour
     [SerializeField]
     Vector3 offset;
 
+    Vector3 desiredPosition;
+    Vector3 smoothedPosition;
 
     // Update is called once per frame
     void LateUpdate()
     {
-        Vector3 desiredPosition = target.position + offset;
-        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed*Time.deltaTime);
+        desiredPosition = target.position + offset;
+        smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed*Time.deltaTime);
         transform.position = smoothedPosition;
     }
 }
